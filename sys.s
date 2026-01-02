@@ -42,8 +42,8 @@ _exit:
 
 wait:
     mov rax, 61
+    mov rsi, rdi
     mov rdi, -1
-    mov rsi, 0
     mov rdx, 0
     mov r10, 0
     syscall

@@ -5,9 +5,8 @@ static const char *path = 0;
 static const char *home = 0;
 
 void build_full_path(char *buf, const char *dir, const char *cmd) {
-    const char *d = dir;
-    while (*d) *buf++ = *d++;
-    if (d[-1] != '/') *buf++ = '/';
+    while (*dir) *buf++ = *dir++;
+    if (dir > buf && dir[-1] != '/') *buf++ = '/';
     while (*cmd) *buf++ = *cmd++;
     *buf = '\0';
 }
@@ -26,8 +25,7 @@ void tokenize(char *line, char **argv, int max_args) {
 }
 
 const char* get_env_value(const char *prefix) {
-    long prefix_len = lenstr(prefix);
-    for (int i = 0; environ[i] != 0; i++) if (environ[i][prefix_len] != '\0' && powstr(environ[i], prefix) == environ[i]) return environ[i] + prefix_len;
+    for (int i = 0; environ[i] != 0; i++) if (powstr(environ[i], prefix) == environ[i]) return environ[i] + lenstr(prefix);
     return 0;
 }
 
@@ -36,13 +34,9 @@ int exec_with_path(const char *cmd, char *const argv[], char *const envp[]) {
         execve(cmd, argv, envp);
         return -1;
     }
-    const char *path_list = path;
     char path_buf[256];
-    long i = 0;
-    while (path_list[i] && i < sizeof(path_buf) - 1) {
-        path_buf[i] = path_list[i];
-        i++;
-    }
+    int i;
+    for (i = 0; path[i] && i < 255; i++) path_buf[i] = path[i];
     path_buf[i] = '\0';
     char *dir = path_buf;
     char full[256];
